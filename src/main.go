@@ -25,11 +25,12 @@ func start() {
 }
 
 func trace(screen wde.Image, tracer *t.Tracer) {
-	ray := t.Ray{Start: t.NewVector(0, 0, 0), Direction: t.NewVector(0, 0, 1)}
+	ray := t.Ray{Origin: t.NewVector(0, 0, 0), Direction: t.NewVector(0, 0, 1)}
+	scene := t.TriangleScene()
 
 	for x := 0; x < screen.Bounds().Dx(); x++ {
 		for y := 0; y < screen.Bounds().Dy(); y++ {
-			c := tracer.TraceRay(ray)
+			c := tracer.TraceRay(ray, scene)
 			screen.Set(x, y, c)
 		}
 	}

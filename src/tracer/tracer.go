@@ -11,6 +11,6 @@ func NewTracer(viewplaneWidth, viewplaneHeight, distance float32) *Tracer {
 	return &Tracer{viewplaneWidth: viewplaneWidth, viewplaneHeight: viewplaneHeight, distance: distance}
 }
 
-func (t *Tracer) TraceRay(r Ray) color.Color {
+func (t *Tracer) TraceRay(r Ray, s Scene) color.Color {
 	return color.RGBA{B: 128}
 }
