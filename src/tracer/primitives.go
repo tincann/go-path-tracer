@@ -2,19 +2,24 @@ package tracer
 
 type Ray struct {
 	Origin    Vector
-	Direction Vector
+	Direction UnitVector
 }
 
 type Vector struct {
-	X, Y, Z float32
+	X, Y, Z float64
 }
 
-func NewVector(x, y, z float32) Vector {
+type UnitVector struct {
+	Vector
+	X, Y, Z float64
+}
+
+func NewVector(x, y, z float64) Vector {
 	return Vector{X: x, Y: y, Z: z}
 }
 
 type Intersectable interface {
-	Intersect(ray Ray) (bool, float32)
+	Intersect(ray Ray) (bool, float64)
 }
 
 type Triangle struct {
@@ -24,7 +29,7 @@ type Triangle struct {
 const epsilon = 1e-8
 
 //Intersect Intersects a ray with a triangle using the Möller–Trumbore algorithm
-func (tr *Triangle) Intersect(ray Ray) (bool, float32) {
+func (tr *Triangle) Intersect(ray Ray) (bool, float64) {
 	e1 := tr.P2.Subtract(tr.P1)
 	e2 := tr.P3.Subtract(tr.P1)
 

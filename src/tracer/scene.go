@@ -10,7 +10,7 @@ func NewScene() Scene {
 	}
 }
 
-func (s Scene) Add(t *Triangle) {
+func (s *Scene) Add(t *Triangle) {
 	s.Objects = append(s.Objects, t)
 }
 
@@ -18,9 +18,9 @@ func TriangleScene() Scene {
 	scene := NewScene()
 
 	t1 := Triangle{
-		P1: NewVector(-0.5, 0, -0.5),
-		P2: NewVector(0.5, 0, -0.5),
-		P3: NewVector(0, 0, 0.5),
+		P1: NewVector(-0.5, 1, -0.5),
+		P2: NewVector(0.5, 1, -0.5),
+		P3: NewVector(0, 1, 0.5),
 	}
 
 	scene.Add(&t1)
