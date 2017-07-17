@@ -17,13 +17,21 @@ func (s *Scene) Add(t *Triangle) {
 func TriangleScene() Scene {
 	scene := NewScene()
 
-	t1 := Triangle{
+	scene.Add(&Triangle{
 		P1: NewVector(-0.5, 1, -0.5),
 		P2: NewVector(0.5, 1, -0.5),
 		P3: NewVector(0, 1, 0.5),
-	}
-
-	scene.Add(&t1)
+	})
+	scene.Add(&Triangle{
+		P1: NewVector(0.5, 1, -0.5),
+		P2: NewVector(-0.5, 1, -0.5),
+		P3: NewVector(0, 1, 0.5),
+	})
+	scene.Add(&Triangle{
+		P1: NewVector(-0.5, -1, -0.5),
+		P2: NewVector(0.5, -1, -0.5),
+		P3: NewVector(0, -1, 0.5),
+	})
 
 	return scene
 }
