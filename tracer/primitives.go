@@ -2,15 +2,10 @@ package tracer
 
 type Ray struct {
 	Origin    Vector
-	Direction UnitVector
+	Direction Vector
 }
 
 type Vector struct {
-	X, Y, Z float64
-}
-
-type UnitVector struct {
-	Vector
 	X, Y, Z float64
 }
 

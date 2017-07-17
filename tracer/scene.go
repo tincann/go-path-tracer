@@ -22,16 +22,16 @@ func TriangleScene() Scene {
 		P2: NewVector(0.5, 1, -0.5),
 		P3: NewVector(0, 1, 0.5),
 	})
-	scene.Add(&Triangle{
-		P1: NewVector(0.5, 1, -0.5),
-		P2: NewVector(-0.5, 1, -0.5),
-		P3: NewVector(0, 1, 0.5),
-	})
-	scene.Add(&Triangle{
-		P1: NewVector(-0.5, -1, -0.5),
-		P2: NewVector(0.5, -1, -0.5),
-		P3: NewVector(0, -1, 0.5),
-	})
+	// scene.Add(&Triangle{
+	// 	P1: NewVector(0.5, 1, -0.5),
+	// 	P2: NewVector(-0.5, 1, -0.5),
+	// 	P3: NewVector(0, 1, 0.5),
+	// })
+	// scene.Add(&Triangle{
+	// 	P1: NewVector(-0.5, -1, -0.5),
+	// 	P2: NewVector(0.5, -1, -0.5),
+	// 	P3: NewVector(0, -1, 0.5),
+	// })
 
 	return scene
 }

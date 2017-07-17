@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/skelterjohn/go.wde"
 	_ "github.com/skelterjohn/go.wde/xgb"
-	t "github.com/tincann/go-path-tracer/src/tracer"
+	t "github.com/tincann/go-path-tracer/tracer"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func trace(screen wde.Image, tracer *t.Tracer) {
 	scene := t.TriangleScene()
 
 	//simple axis aligned camera
-	eye := t.NewVector(0, -tracer.Distance, 0)
+	eye := t.NewVector(0, tracer.Distance, 0)
 
 	//viewplane definition
 	topleft := t.NewVector(-tracer.ViewplaneWidth/2, 0, tracer.ViewplaneHeight/2)
@@ -47,6 +47,7 @@ func trace(screen wde.Image, tracer *t.Tracer) {
 
 			p := topleft.Add(e1.Multiply(vx)).Add(e2.Multiply(vy))
 			direction := p.Subtract(eye).Normalize()
+
 			ray := t.Ray{Origin: eye, Direction: direction}
 
 			c := tracer.TraceRay(ray, scene)
