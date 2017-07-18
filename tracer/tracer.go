@@ -31,7 +31,7 @@ func (t *Tracer) TraceRay(ray Ray, scene Scene, bouncesLeft int) Color {
 	if intersectedObj == nil {
 		return scene.Background
 	}
-	intersection := ray.Origin.Add(ray.Direction.Multiply(rayT)).Add(normal.Multiply(0.00001))
+	intersection := ray.Origin.Add(ray.Direction.Multiply(rayT)).Add(normal.Multiply(-0.00001))
 
 	mat := intersectedObj.Material()
 	switch mat.Type {

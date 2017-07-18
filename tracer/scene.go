@@ -18,40 +18,40 @@ func (s *Scene) AddObject(t Intersectable) {
 func TriangleScene() Scene {
 	scene := NewScene()
 
-	scene.Background = Color{R: 111 / 255.0, G: 159 / 255.0, B: 237 / 255.0}
+	// scene.Background = Color{R: 111 / 255.0, G: 159 / 255.0, B: 237 / 255.0}
 
 	lightmat := Material{
-		Color: Color{R: 1, G: 1, B: 1},
+		Color: Color{R: 2, G: 2, B: 2},
 		Type:  Light,
-	}
-	mat := Material{
-		Color: Color{R: 1, G: 1, B: 1},
-		Type:  Diffuse,
 	}
 
 	//light
 	scene.AddObject(NewQuad(
-		NewVector(-5, 0, 2),
-		NewVector(-5, 2.5, 2),
-		NewVector(5, 2.5, 2),
-		NewVector(5, 0, 2),
+		NewVector(-3, 1.5, 2),
+		NewVector(-3, 4, 2),
+		NewVector(3, 4, 2),
+		NewVector(3, 1.5, 2),
 		lightmat,
 	))
 
 	//triangle
 	scene.AddObject(NewTriangle(
-		NewVector(-1.5, 1, -0.5),
 		NewVector(-0.5, 1, -0.5),
+		NewVector(-1.5, 1, -0.5),
 		NewVector(-1, 1.5, 0.2),
-		mat,
+		Material{
+			Color: Color{G: 0.8},
+			Type:  Diffuse,
+		},
 	))
 
 	//sphere
 	scene.AddObject(NewSphere(
-		NewVector(0, 1, -0.5),
+		NewVector(0, 1.5, -0.5),
 		0.5,
 		Material{
-			Type: Diffuse,
+			Color: Color{R: 0.8},
+			Type:  Diffuse,
 		},
 	))
 
@@ -60,7 +60,7 @@ func TriangleScene() Scene {
 		NewVector(0, 0, 1),
 		-1,
 		Material{
-			Color: Color{R: 1, G: 1, B: 1},
+			Color: Color{R: 0.8, G: 0.8, B: 0.8},
 			Type:  Diffuse,
 		},
 	))
