@@ -1,16 +1,13 @@
 package tracer
 
-import "image/color"
-
 type LightSource struct {
 	Object Intersectable
-	Color  color.Color
+	Color  Color
 }
 
-func NewLightSource(object Intersectable, color color.Color) *LightSource {
+func NewLightSource(object Intersectable) *LightSource {
 	return &LightSource{
 		Object: object,
-		Color:  color,
 	}
 }
 

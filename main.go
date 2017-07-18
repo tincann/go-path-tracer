@@ -1,6 +1,8 @@
 package main
 
 import (
+	"image/color"
+
 	"github.com/skelterjohn/go.wde"
 	_ "github.com/skelterjohn/go.wde/xgb"
 	t "github.com/tincann/go-path-tracer/tracer"
@@ -51,11 +53,19 @@ func trace(screen wde.Image, tracer *t.Tracer) {
 
 			ray := t.Ray{Origin: eye, Direction: direction}
 
-			c := tracer.TraceRay(ray, scene)
-			screen.Set(x, y, c)
+			c := tracer.TraceRay(ray, scene, 2)
+			screen.Set(x, y, toSystemColor(c))
 		}
 	}
 
+}
+
+func toSystemColor(c t.Color) color.RGBA {
+	return color.RGBA{
+		R: uint8(c.R * 255),
+		G: uint8(c.G * 255),
+		B: uint8(c.B * 255),
+	}
 }
 
 func handleEvents(w wde.Window) {

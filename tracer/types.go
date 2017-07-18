@@ -1,9 +1,5 @@
 package tracer
 
-import (
-	"image/color"
-)
-
 type Ray struct {
 	Origin    Vector
 	Direction Vector
@@ -15,8 +11,13 @@ type Intersectable interface {
 }
 
 type Material struct {
-	Color color.Color
-	Type  MaterialType
+	Color       Color
+	Type        MaterialType
+	Specularity float32
+}
+
+type Color struct {
+	R, G, B float32
 }
 
 type MaterialType int

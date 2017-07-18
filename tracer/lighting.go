@@ -1,18 +1,35 @@
 package tracer
 
 import (
-	"image/color"
 	"math"
 	"math/rand"
 )
 
-func (t *Tracer) diffuse(scene Scene, intersection Vector, mat Material, normal Vector) color.Color {
-	// ray := Ray{
-	// 	Origin:    intersection,
-	// 	Direction: uniformHemisphereSample(normal),
-	// }
+func (t *Tracer) diffuse(scene Scene, intersection Vector, mat Material, normal Vector, bouncesLeft int) Color {
+	ray := Ray{
+		Origin:    intersection,
+		Direction: uniformHemisphereSample(normal),
+	}
 
-	return mat.Color
+	diffuseColor := mat.Color.Multiply(1 - mat.Specularity)
+	reflectedColor := t.TraceRay(ray, scene, bouncesLeft).Multiply(mat.Specularity)
+	return diffuseColor.Add(reflectedColor)
+}
+
+func (c Color) Add(c2 Color) Color {
+	return Color{
+		R: c.R + c2.R,
+		G: c.G + c2.G,
+		B: c.B + c2.B,
+	}
+}
+
+func (c Color) Multiply(scalar float32) Color {
+	return Color{
+		R: c.R * scalar,
+		G: c.G * scalar,
+		B: c.B * scalar,
+	}
 }
 
 func reflectRay(ray Ray, intersection Vector) {
