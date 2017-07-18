@@ -2,6 +2,14 @@ package tracer
 
 import "math"
 
+type Vector struct {
+	X, Y, Z float64
+}
+
+func NewVector(x, y, z float64) Vector {
+	return Vector{X: x, Y: y, Z: z}
+}
+
 func (v Vector) Length() float64 {
 	return math.Sqrt(v.X*v.X + v.Y*v.Y + v.Z*v.Z)
 }

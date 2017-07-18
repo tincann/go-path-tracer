@@ -13,23 +13,42 @@ func NewTracer(viewplaneWidth, viewplaneHeight, distance float64) *Tracer {
 	return &Tracer{ViewplaneWidth: viewplaneWidth, ViewplaneHeight: viewplaneHeight, Distance: distance}
 }
 
-func (t *Tracer) TraceRay(r Ray, s Scene) color.Color {
-	minT := math.MaxFloat64
-	var closestObject Intersectable
-	for _, object := range s.Objects {
-		if yes, t := object.Intersect(r); yes && t < minT {
-			minT = t
-			closestObject = object
+func (t *Tracer) TraceRay(ray Ray, scene Scene) color.Color {
+	rayT := math.MaxFloat64
+	var intersectedObj Intersectable
+	var normal Vector
+	for _, object := range scene.Objects {
+		if yes, t, n := object.Intersect(ray); yes && t < rayT {
+			rayT = t
+			intersectedObj = object
+			normal = n
 		}
 	}
 
-	if closestObject != nil {
-		return color.RGBA{R: 128}
+	if intersectedObj == nil {
+		return color.RGBA{
+			R: uint8(rand.Int31n(64)),
+			G: uint8(rand.Int31n(64)),
+			B: uint8(rand.Int31n(64)),
+		}
+	}
+	intersection := ray.Origin.Add(ray.Direction.Multiply(rayT))
+
+	mat := intersectedObj.Material()
+	switch mat.Type {
+	case Diffuse:
+		return t.diffuse(scene, intersection, mat, normal)
+	case Light:
+		return mat.Color
 	}
 
-	return color.RGBA{
-		R: uint8(rand.Int31n(64)),
-		G: uint8(rand.Int31n(64)),
-		B: uint8(rand.Int31n(64)),
-	}
+	//calculate reflected ray
+	// p := ray.Origin.Add(ray.Direction.Multiply(rayT)) //intersection point
+	// for _, light := range scene.Lights {
+	// 	shadowRay := light.Subtract(p)
+	// }
+
+	// r := ray.Direction.Subtract(normal.Multiply(2 * ray.Direction.Dot(normal))) //d - 2*(d . n)n
+
+	return color.RGBA{R: 128}
 }

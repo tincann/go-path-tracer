@@ -15,6 +15,7 @@ func start() {
 	w, _ := wde.NewWindow(500, 500)
 	go handleEvents(w)
 
+	w.FlushImage(w.Screen().Bounds())
 	w.Show()
 
 	tracer := t.NewTracer(2, 2, -1)
@@ -54,6 +55,7 @@ func trace(screen wde.Image, tracer *t.Tracer) {
 			screen.Set(x, y, c)
 		}
 	}
+
 }
 
 func handleEvents(w wde.Window) {
