@@ -1,16 +1,5 @@
 package tracer
 
-type LightSource struct {
-	Object Intersectable
-	Color  Color
-}
-
-func NewLightSource(object Intersectable) *LightSource {
-	return &LightSource{
-		Object: object,
-	}
-}
-
 type Primitive struct {
 	Intersectable
 	material Material

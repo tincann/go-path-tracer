@@ -11,8 +11,11 @@ func (t *Tracer) diffuse(scene Scene, intersection Vector, mat Material, normal 
 		Direction: uniformHemisphereSample(normal),
 	}
 
-	diffuseColor := mat.Color.Multiply(1 - mat.Specularity)
-	reflectedColor := t.TraceRay(ray, scene, bouncesLeft).Multiply(mat.Specularity)
+	var diffuseColor, reflectedColor Color
+	diffuseColor = mat.Color.Multiply(1 - mat.Specularity)
+	if mat.Specularity > 0 {
+		reflectedColor = t.TraceRay(ray, scene, bouncesLeft).Multiply(mat.Specularity)
+	}
 	return diffuseColor.Add(reflectedColor)
 }
 

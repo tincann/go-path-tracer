@@ -62,10 +62,21 @@ func trace(screen wde.Image, tracer *t.Tracer) {
 
 func toSystemColor(c t.Color) color.RGBA {
 	return color.RGBA{
-		R: uint8(c.R * 255),
-		G: uint8(c.G * 255),
-		B: uint8(c.B * 255),
+		R: uint8(clamp(c.R, 0, 1) * 255),
+		G: uint8(clamp(c.G, 0, 1) * 255),
+		B: uint8(clamp(c.B, 0, 1) * 255),
 	}
+}
+
+func clamp(value, min, max float32) float32 {
+	if value > max {
+		return max
+	}
+	if value < min {
+		return min
+	}
+
+	return value
 }
 
 func handleEvents(w wde.Window) {
