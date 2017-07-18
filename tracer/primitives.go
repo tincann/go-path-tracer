@@ -59,19 +59,33 @@ func (tr *Triangle) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
 	return true, t, n
 }
 
-//Todo Quad primitive
-// type Quad struct {
-// 	P1, P2, P3, P4 Vector
-// 	Normal         Vector
-// }
+type Quad struct {
+	Primitive
+	P1, P2, P3, P4 Vector
+	Normal         Vector
+}
 
-// func NewQuad(p1, p2, p3, p4 Vector) *Quad {
-// 	e1 := p2.Subtract(p1)
-// 	e2 := p3.Subtract(p1)
-// 	n := e1.Cross(e2).Normalize()
-// 	return &Quad{P1: p1, P2: p2, P3: p3, P4: p4, Normal: n}
-// }
+func NewQuad(p1, p2, p3, p4 Vector, material Material) *Quad {
+	e1 := p2.Subtract(p1)
+	e2 := p3.Subtract(p1)
+	n := e1.Cross(e2).Normalize()
+	q := Quad{P1: p1, P2: p2, P3: p3, P4: p4, Normal: n}
+	q.material = material
+	return &q
+}
 
-// func (tr *Quad) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
+//todo don't use triangles
+func (q *Quad) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
+	t1 := Triangle{P1: q.P1, P2: q.P2, P3: q.P4}
+	t2 := Triangle{P1: q.P2, P2: q.P3, P3: q.P4}
 
-// }
+	if intersected, t, n := t1.Intersect(ray); intersected {
+		return intersected, t, n
+	}
+
+	if intersected, t, n := t2.Intersect(ray); intersected {
+		return intersected, t, n
+	}
+
+	return false, t, n
+}

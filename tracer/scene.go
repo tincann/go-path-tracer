@@ -31,10 +31,11 @@ func TriangleScene() Scene {
 	}
 
 	//light
-	scene.AddObject(NewTriangle(
-		NewVector(0.5, 1, 2),
-		NewVector(-0.5, 1, 2),
-		NewVector(0, 2, 2),
+	scene.AddObject(NewQuad(
+		NewVector(-1, 1, 2),
+		NewVector(-1, 1.5, 2),
+		NewVector(1, 1.5, 2),
+		NewVector(1, 1, 2),
 		lightmat,
 	))
 
