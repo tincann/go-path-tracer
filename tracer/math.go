@@ -14,6 +14,10 @@ func (v Vector) Length() float64 {
 	return math.Sqrt(v.X*v.X + v.Y*v.Y + v.Z*v.Z)
 }
 
+func (v Vector) LengthSquared() float64 {
+	return v.X*v.X + v.Y*v.Y + v.Z*v.Z
+}
+
 func (v Vector) Normalize() Vector {
 	l := v.Length()
 	return Vector{
