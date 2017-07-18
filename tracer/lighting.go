@@ -11,32 +11,11 @@ func (t *Tracer) diffuse(scene Scene, intersection Vector, mat Material, normal 
 		Direction: uniformHemisphereSample(normal),
 	}
 
-	var diffuseColor, reflectedColor Color
-	diffuseColor = mat.Color.Multiply(1 - mat.Specularity)
-	if mat.Specularity > 0 {
-		reflectedColor = t.TraceRay(ray, scene, bouncesLeft).Multiply(mat.Specularity)
-	}
-	return diffuseColor.Add(reflectedColor)
-}
+	brdf := mat.Color.Divide(math.Pi)
+	nDotR := normal.Dot(ray.Direction)
+	Ei := t.TraceRay(ray, scene, bouncesLeft).Multiply(float32(nDotR))
 
-func (c Color) Add(c2 Color) Color {
-	return Color{
-		R: c.R + c2.R,
-		G: c.G + c2.G,
-		B: c.B + c2.B,
-	}
-}
-
-func (c Color) Multiply(scalar float32) Color {
-	return Color{
-		R: c.R * scalar,
-		G: c.G * scalar,
-		B: c.B * scalar,
-	}
-}
-
-func reflectRay(ray Ray, intersection Vector) {
-
+	return Ei.MultiplyC(brdf).Multiply(math.Pi * 2)
 }
 
 func uniformHemisphereSample(orientation Vector) Vector {
@@ -55,14 +34,3 @@ func uniformHemisphereSample(orientation Vector) Vector {
 
 	return v
 }
-
-// Vector3 Sample::CosineSampleHemisphere(float u1, float u2)
-// {
-//     const float r = Sqrt(u1);
-//     const float theta = 2 * kPi * u2;
-
-//     const float x = r * Cos(theta);
-//     const float y = r * Sin(theta);
-
-//     return Vector3(x, y, Sqrt(Max(0.0f, 1 - u1)));
-// }

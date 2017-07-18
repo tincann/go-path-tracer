@@ -1,5 +1,9 @@
 package tracer
 
+import (
+	"math"
+)
+
 type Primitive struct {
 	Intersectable
 	material Material
@@ -109,3 +113,41 @@ func (q *Quad) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
 
 	return false, t, n
 }
+
+type Sphere struct {
+	Primitive
+	Center       Vector
+	Radius, rad2 float64
+}
+
+func NewSphere(center Vector, radius float64, material Material) *Sphere {
+	s := Sphere{Center: center, Radius: radius, rad2: radius * radius}
+	s.material = material
+	return &s
+}
+
+func (s *Sphere) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
+	c := ray.Origin.Subtract(s.Center)
+	t = c.Multiply(-1).Dot(ray.Direction)
+	q := c.Multiply(-1).Subtract(ray.Direction.Multiply(t))
+	p2 := q.Dot(q)
+	if p2 > s.rad2 {
+		return false, t, n
+	}
+	t -= math.Sqrt(s.rad2 - p2)
+
+	if t > 0 {
+		p := ray.Origin.Add(ray.Direction.Multiply(t))
+		n = p.Subtract(s.Center).Normalize()
+		return true, t, n
+	}
+
+	return false, t, n
+}
+
+// //fast way to calculate
+// t = Vector3.Dot(-C, ray.Direction);
+// var q = -C - t*ray.Direction;
+// float p2 = Vector3.Dot(q, q);
+// if (p2 > _rad2) return false;
+// t -= (float) Math.Sqrt(_rad2 - p2);

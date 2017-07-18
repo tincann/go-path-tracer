@@ -58,3 +58,35 @@ func (v1 Vector) Cross(v2 Vector) Vector {
 		Z: v1.X*v2.Y - v1.Y*v2.X,
 	}
 }
+
+func (c Color) Add(c2 Color) Color {
+	return Color{
+		R: c.R + c2.R,
+		G: c.G + c2.G,
+		B: c.B + c2.B,
+	}
+}
+
+func (c Color) Multiply(scalar float32) Color {
+	return Color{
+		R: c.R * scalar,
+		G: c.G * scalar,
+		B: c.B * scalar,
+	}
+}
+
+func (c Color) MultiplyC(c2 Color) Color {
+	return Color{
+		R: c.R * c2.R,
+		G: c.G * c2.G,
+		B: c.B * c2.B,
+	}
+}
+
+func (c Color) Divide(scalar float32) Color {
+	return Color{
+		R: c.R / scalar,
+		G: c.G / scalar,
+		B: c.B / scalar,
+	}
+}

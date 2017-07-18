@@ -30,10 +30,6 @@ func (t *Tracer) TraceRay(ray Ray, scene Scene, bouncesLeft int) Color {
 
 	if intersectedObj == nil {
 		return scene.Background
-		// 	R: rand.Float32() * 0.3,
-		// 	G: rand.Float32() * 0.3,
-		// 	B: rand.Float32() * 0.3,
-		// }
 	}
 	intersection := ray.Origin.Add(ray.Direction.Multiply(rayT)).Add(normal.Multiply(0.00001))
 
