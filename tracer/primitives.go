@@ -9,6 +9,26 @@ func (p Primitive) Material() Material {
 	return p.material
 }
 
+type Plane struct {
+	Primitive
+	Normal Vector
+	D      float64
+}
+
+func NewPlane(normal Vector, d float64, material Material) *Plane {
+	p := Plane{
+		Normal: normal.Normalize(),
+		D:      d,
+	}
+	p.material = material
+	return &p
+}
+
+func (p *Plane) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
+	t = (ray.Origin.Dot(p.Normal) + p.D) / ray.Direction.Dot(p.Normal)
+	return t >= 0, t, p.Normal
+}
+
 type Triangle struct {
 	Primitive
 	P1, P2, P3 Vector

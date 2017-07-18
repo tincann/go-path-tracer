@@ -47,6 +47,16 @@ func TriangleScene() Scene {
 		mat,
 	))
 
+	scene.AddObject(NewPlane(
+		NewVector(0, 0, 1),
+		-1,
+		Material{
+			Color:       Color{R: 0.3, G: 0.3, B: 0.3},
+			Type:        Diffuse,
+			Specularity: 0.3,
+		},
+	))
+
 	// scene.AddObject(&Triangle{
 	// 	P1: NewVector(-0.5, -1, -0.5),
 	// 	P2: NewVector(0.5, -1, -0.5),
