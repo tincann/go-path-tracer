@@ -21,13 +21,16 @@ func start() {
 	w.Show()
 
 	tracer := t.NewTracer(2, 2, -1)
+	acc := t.NewAccumulator(w.Screen().Bounds())
+
 	for {
-		trace(w.Screen(), tracer)
-		w.FlushImage(w.Screen().Bounds())
+		trace(w.Screen(), acc, tracer)
+		w.FlushImage(acc.Bounds)
+		acc.NextFrame()
 	}
 }
 
-func trace(screen wde.Image, tracer *t.Tracer) {
+func trace(screen wde.Image, acc *t.Accumulator, tracer *t.Tracer) {
 	//ray := t.Ray{Origin: t.NewVector(0, 0, 0), Direction: t.NewVector(0, -1, 0).Normalize()}
 	scene := t.TriangleScene()
 
@@ -41,7 +44,7 @@ func trace(screen wde.Image, tracer *t.Tracer) {
 	e1 := topright.Subtract(topleft)
 	e2 := bottomleft.Subtract(topleft)
 
-	maxX, maxY := screen.Bounds().Dx(), screen.Bounds().Dy()
+	maxX, maxY := acc.Bounds.Dx(), acc.Bounds.Dy()
 
 	for x := 0; x < maxX; x++ {
 		for y := 0; y < maxY; y++ {
@@ -54,10 +57,10 @@ func trace(screen wde.Image, tracer *t.Tracer) {
 			ray := t.Ray{Origin: eye, Direction: direction}
 
 			c := tracer.TraceRay(ray, scene, 2)
-			screen.Set(x, y, toSystemColor(c))
+			avg := acc.SetPixel(x, y, c)
+			screen.Set(x, y, toSystemColor(avg))
 		}
 	}
-
 }
 
 func toSystemColor(c t.Color) color.RGBA {

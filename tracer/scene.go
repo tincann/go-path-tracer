@@ -18,7 +18,7 @@ func (s *Scene) AddObject(t Intersectable) {
 func TriangleScene() Scene {
 	scene := NewScene()
 
-	scene.Background = Color{R: 111 / 255.0, G: 159 / 255.0, B: 237 / 255.0}
+	// scene.Background = Color{R: 111 / 255.0, G: 159 / 255.0, B: 237 / 255.0}
 
 	lightmat := Material{
 		Color: Color{R: 1, G: 1, B: 1},
@@ -32,10 +32,10 @@ func TriangleScene() Scene {
 
 	//light
 	scene.AddObject(NewQuad(
-		NewVector(-1, 1, 2),
-		NewVector(-1, 1.5, 2),
-		NewVector(1, 1.5, 2),
-		NewVector(1, 1, 2),
+		NewVector(-1, 1, 1),
+		NewVector(-1, 1.5, 1),
+		NewVector(1, 1.5, 1),
+		NewVector(1, 1, 1),
 		lightmat,
 	))
 
