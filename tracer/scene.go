@@ -18,21 +18,21 @@ func (s *Scene) AddObject(t Intersectable) {
 func TriangleScene() Scene {
 	scene := NewScene()
 
-	// scene.Background = Color{R: 111 / 255.0, G: 159 / 255.0, B: 237 / 255.0}
+	// scene.Background = Color{R: 55 / 255.0, G: 55 / 255.0, B: 55 / 255.0}
 
-	lightmat := Material{
-		Color: Color{R: 2, G: 2, B: 2},
-		Type:  Light,
-	}
+	// lightmat := Material{
+	// 	Color: Color{R: 2, G: 2, B: 2},
+	// 	Type:  Light,
+	// }
 
 	//light
-	scene.AddObject(NewQuad(
-		NewVector(-3, 1.5, 2),
-		NewVector(-3, 4, 2),
-		NewVector(3, 4, 2),
-		NewVector(3, 1.5, 2),
-		lightmat,
-	))
+	// scene.AddObject(NewQuad(
+	// 	NewVector(-3, 1.5, 2),
+	// 	NewVector(-3, 4, 2),
+	// 	NewVector(3, 4, 2),
+	// 	NewVector(3, 1.5, 2),
+	// 	lightmat,
+	// ))
 
 	//triangle
 	scene.AddObject(NewTriangle(
@@ -55,6 +55,14 @@ func TriangleScene() Scene {
 		},
 	))
 
+	scene.AddObject(NewQuad(
+		NewVector(5, -2, -1),
+		NewVector(5, -2, 1),
+		NewVector(5, 2, 1),
+		NewVector(5, 2, -1),
+		newLightMaterial(Color{1, 1, 1}, 10),
+	))
+
 	//floor
 	scene.AddObject(NewPlane(
 		NewVector(0, 0, 1),
@@ -66,4 +74,11 @@ func TriangleScene() Scene {
 	))
 
 	return scene
+}
+
+func newLightMaterial(color Color, intensity float32) Material {
+	return Material{
+		Color: color.Multiply(intensity),
+		Type:  Light,
+	}
 }

@@ -15,7 +15,7 @@ func main() {
 
 func start() {
 	w, _ := wde.NewWindow(500, 500)
-	tracer := t.NewTracer(2, 2, -1)
+	tracer := t.NewTracer(2, 2, -3)
 	acc := t.NewAccumulator(w.Screen().Bounds())
 
 	go handleEvents(w, w.Screen(), acc, tracer)

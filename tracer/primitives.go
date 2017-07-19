@@ -54,6 +54,10 @@ const epsilon = 1e-8
 //Intersect Intersects a ray with a triangle using the Möller–Trumbore algorithm
 func (tr *Triangle) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
 	n = tr.Normal
+	// if ray.Direction.Dot(n) < 0 {
+	// 	n = n.Multiply(-1)
+	// }
+
 	t = 0
 	e1 := tr.P2.Subtract(tr.P1)
 	e2 := tr.P3.Subtract(tr.P1)
