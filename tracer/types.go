@@ -9,6 +9,11 @@ func (r *Ray) Point(t float64) Vector {
 	return r.Origin.Add(r.Direction.Multiply(t))
 }
 
+type RayInfo struct {
+	Ray  Ray //todo multiple rays per pixel
+	X, Y int //Pixel location
+}
+
 type Intersectable interface {
 	Intersect(ray Ray) (intersected bool, t float64, n Vector)
 	Material() Material

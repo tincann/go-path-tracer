@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image"
 	"image/color"
 
 	"github.com/skelterjohn/go.wde"
@@ -15,78 +16,44 @@ func main() {
 
 func start() {
 	w, _ := wde.NewWindow(500, 500)
-	tracer := t.NewTracer(2, 2, -3)
 	acc := t.NewAccumulator(w.Screen().Bounds())
 
+	scene := t.TriangleScene()
+
+	eye := t.NewVector(0, -3, 0)
+	direction := t.NewVector(0, 1, 0)
+	camera := t.NewCamera(
+		eye,
+		direction,
+		t.NewVector(0, 0, 1),
+		1.5, //distance to image plane
+		3,   //image plane width
+		3,   //image plane height
+		0.5, //move speed
+	)
+	tracer := t.NewTracer(camera)
 	go handleEvents(w, w.Screen(), acc, tracer)
 
 	w.FlushImage(w.Screen().Bounds())
 	w.Show()
 
 	for {
-		trace(w.Screen(), acc, tracer)
+		trace(w.Screen(), acc, tracer, scene)
 		w.FlushImage(acc.Bounds)
 		acc.NextFrame()
 	}
 }
 
-func trace(screen wde.Image, acc *t.Accumulator, tracer *t.Tracer) {
-	//ray := t.Ray{Origin: t.NewVector(0, 0, 0), Direction: t.NewVector(0, -1, 0).Normalize()}
-	scene := t.TriangleScene()
+func trace(screen wde.Image, acc *t.Accumulator, tracer *t.Tracer, scene *t.Scene) {
+	b := screen.Bounds()
+	rayInfos := tracer.Camera.GenerateRays(image.Point{b.Max.X, b.Max.Y}, b)
 
-	//simple axis aligned camera
-	eye := t.NewVector(0, tracer.Distance, 0)
-
-	//viewplane definition
-	topleft := t.NewVector(-tracer.ViewplaneWidth/2, 0, tracer.ViewplaneHeight/2)
-	topright := t.NewVector(tracer.ViewplaneWidth/2, 0, tracer.ViewplaneHeight/2)
-	bottomleft := t.NewVector(-tracer.ViewplaneWidth/2, 0, -tracer.ViewplaneHeight/2)
-	e1 := topright.Subtract(topleft)
-	e2 := bottomleft.Subtract(topleft)
-
-	maxX, maxY := acc.Bounds.Dx(), acc.Bounds.Dy()
-
-	for x := 0; x < maxX; x++ {
-		for y := 0; y < maxY; y++ {
-			vx := float64(x) / float64(maxX)
-			vy := float64(y) / float64(maxY)
-
-			p := topleft.Add(e1.Multiply(vx)).Add(e2.Multiply(vy))
-			direction := p.Subtract(eye).Normalize()
-
-			ray := t.Ray{Origin: eye, Direction: direction}
-
-			c := tracer.TraceRay(ray, scene, 4)
-			avg := acc.SetPixel(x, y, c)
-			screen.Set(x, y, toSystemColor(avg))
-		}
+	for _, rayInfo := range rayInfos {
+		c := tracer.TraceRay(rayInfo.Ray, scene, 4)
+		avg := acc.SetPixel(rayInfo.X, rayInfo.Y, c)
+		screen.Set(rayInfo.X, rayInfo.Y, toSystemColor(avg))
 	}
 }
-
-// func traceSingle(x, y int, screen wde.Image, acc *t.Accumulator, tracer *t.Tracer) {
-// 	//todo refactor copy paste
-// 	scene := t.TriangleScene()
-
-// 	eye := t.NewVector(0, tracer.Distance, 0)
-
-// 	//viewplane definition
-// 	topleft := t.NewVector(-tracer.ViewplaneWidth/2, 0, tracer.ViewplaneHeight/2)
-// 	topright := t.NewVector(tracer.ViewplaneWidth/2, 0, tracer.ViewplaneHeight/2)
-// 	bottomleft := t.NewVector(-tracer.ViewplaneWidth/2, 0, -tracer.ViewplaneHeight/2)
-// 	e1 := topright.Subtract(topleft)
-// 	e2 := bottomleft.Subtract(topleft)
-
-// 	maxX, maxY := acc.Bounds.Dx(), acc.Bounds.Dy()
-// 	vx := float64(x) / float64(maxX)
-// 	vy := float64(y) / float64(maxY)
-
-// 	p := topleft.Add(e1.Multiply(vx)).Add(e2.Multiply(vy))
-// 	direction := p.Subtract(eye).Normalize()
-
-// 	ray := t.Ray{Origin: eye, Direction: direction}
-
-// 	tracer.TraceRay(ray, scene, 3)
-// }
 
 func toSystemColor(c t.Color) color.RGBA {
 	return color.RGBA{
@@ -110,16 +77,36 @@ func clamp(value, min, max float32) float32 {
 func handleEvents(w wde.Window, screen wde.Image, acc *t.Accumulator, tracer *t.Tracer) {
 	for {
 		e := <-w.EventChan()
+
+		moveVector := t.NewVector(0, 0, 0)
 		switch e.(type) {
+
 		case wde.KeyDownEvent:
 			event := e.(wde.KeyDownEvent)
-			if event.Key == wde.KeyEscape {
-				wde.Stop()
-			}
+			switch event.Key {
 
-			// case wde.MouseDownEvent:
-			// 	event := e.(wde.MouseDownEvent)
-			// 	traceSingle(event.Where.X, event.Where.Y, screen, acc, tracer)
+			case wde.KeyEscape:
+				wde.Stop()
+
+			//camera movement
+			case wde.KeyW:
+				moveVector.Y++
+			case wde.KeyS:
+				moveVector.Y--
+			case wde.KeyA:
+				moveVector.X--
+			case wde.KeyD:
+				moveVector.X++
+			case wde.KeySpace:
+				moveVector.Z++
+			case wde.KeyLeftShift:
+				moveVector.Z--
+			}
+		}
+
+		if moveVector.X != 0 || moveVector.Y != 0 || moveVector.Z != 0 {
+			acc.Reset()
+			tracer.Camera.Move(moveVector)
 		}
 	}
 }

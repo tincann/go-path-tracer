@@ -47,21 +47,21 @@ func TriangleScene() *Scene {
 	// ))
 
 	//sphere
-	// scene.AddObject(NewSphere(
-	// 	NewVector(0, 1.5, -0.5),
-	// 	0.5,
-	// 	Material{
-	// 		Color: Color{R: 0.8},
-	// 		Type:  Diffuse,
-	// 	},
-	// ))
+	scene.AddObject(NewSphere(
+		NewVector(0, 1.5, -0.5),
+		0.5,
+		Material{
+			Color: Color{R: 0.8},
+			Type:  Diffuse,
+		},
+	))
 
 	//cube
-	mat := Material{
-		Color: Color{1, 1, 1},
-		Type:  Diffuse,
-	}
-	addCube(scene, Vector{0, 1, -0.5}, 1, mat)
+	// mat := Material{
+	// 	Color: Color{1, 1, 1},
+	// 	Type:  Diffuse,
+	// }
+	// addCube(scene, Vector{0, 1, -0.5}, 1, mat)
 
 	// position := Vector{0, 3, 0}
 	// h := 1.0 / 2.0

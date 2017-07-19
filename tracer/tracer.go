@@ -3,12 +3,11 @@ package tracer
 import "math"
 
 type Tracer struct {
-	ViewplaneWidth, ViewplaneHeight float64 //width and height of the view plane
-	Distance                        float64 //camera distance from view plane
+	Camera *Camera
 }
 
-func NewTracer(viewplaneWidth, viewplaneHeight, distance float64) *Tracer {
-	return &Tracer{ViewplaneWidth: viewplaneWidth, ViewplaneHeight: viewplaneHeight, Distance: distance}
+func NewTracer(camera *Camera) *Tracer {
+	return &Tracer{Camera: camera}
 }
 
 func (t *Tracer) TraceRay(ray Ray, scene *Scene, bouncesLeft int) Color {
