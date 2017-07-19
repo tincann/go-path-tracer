@@ -147,6 +147,9 @@ func (s *Sphere) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
 	}
 
 	t = -b - math.Sqrt(discr)
+	if t < 0 {
+		t = 0
+	}
 	n = ray.Point(t).Subtract(s.Center).Normalize()
 	return true, t, n
 

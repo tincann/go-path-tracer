@@ -31,7 +31,9 @@ func start() {
 		3,   //image plane height
 		0.5, //move speed
 	)
+
 	tracer := t.NewTracer(camera)
+
 	go handleEvents(w, w.Screen(), acc, tracer)
 
 	w.FlushImage(w.Screen().Bounds())
@@ -41,6 +43,7 @@ func start() {
 		trace(w.Screen(), acc, tracer, scene)
 		w.FlushImage(acc.Bounds)
 		acc.NextFrame()
+
 	}
 }
 
@@ -79,6 +82,7 @@ func handleEvents(w wde.Window, screen wde.Image, acc *t.Accumulator, tracer *t.
 		e := <-w.EventChan()
 
 		moveVector := t.NewVector(0, 0, 0)
+		theta, phi := 0.0, 0.0
 		switch e.(type) {
 
 		case wde.KeyDownEvent:
@@ -101,12 +105,25 @@ func handleEvents(w wde.Window, screen wde.Image, acc *t.Accumulator, tracer *t.
 				moveVector.Z++
 			case wde.KeyLeftShift:
 				moveVector.Z--
+			case wde.KeyLeftArrow:
+				theta--
+			case wde.KeyRightArrow:
+				theta++
+
+			case wde.KeyTab:
+				acc.Reset()
+
 			}
 		}
 
 		if moveVector.X != 0 || moveVector.Y != 0 || moveVector.Z != 0 {
-			acc.Reset()
 			tracer.Camera.Move(moveVector)
+			acc.Reset()
+		}
+
+		if theta != 0 || phi != 0 {
+			tracer.Camera.Rotate(phi, theta)
+			acc.Reset()
 		}
 	}
 }

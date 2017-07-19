@@ -19,21 +19,21 @@ func TriangleScene() *Scene {
 	scene := NewScene()
 
 	// scene.Background = Color{R: 55 / 255.0, G: 55 / 255.0, B: 55 / 255.0}
-	scene.Background = Color{1, 1, 1}
+	// scene.Background = Color{1, 1, 1}
 
-	lightmat := Material{
-		Color: Color{R: 2, G: 2, B: 2},
-		Type:  Light,
-	}
+	// lightmat := Material{
+	// 	Color: Color{R: 2, G: 2, B: 2},
+	// 	Type:  Light,
+	// }
 
 	// light
-	scene.AddObject(NewQuad(
-		NewVector(-3, 1.5, 2),
-		NewVector(-3, 4, 2),
-		NewVector(3, 4, 2),
-		NewVector(3, 1.5, 2),
-		lightmat,
-	))
+	// scene.AddObject(NewQuad(
+	// 	NewVector(-3, 1.5, 2),
+	// 	NewVector(-3, 4, 2),
+	// 	NewVector(3, 4, 2),
+	// 	NewVector(3, 1.5, 2),
+	// 	lightmat,
+	// ))
 
 	//triangle
 	// scene.AddObject(NewTriangle(

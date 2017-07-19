@@ -69,6 +69,15 @@ func (c *Camera) Move(direction Vector) {
 	c.updateImagePlane()
 }
 
+func (c *Camera) Rotate(deltaTheta, deltaPhi float64) {
+	//rotate round up vector
+	// a1 := c.Direction.Multiply(math.Cos(deltaTheta))
+	// a2 := c.right.Multiply(math.Sin(deltaTheta))
+	// a3 := c.Direction.Multiply(c.Up.Dot(c.Direction) * (1 - math.Cos(deltaTheta)))
+	// c.Direction = a1.Add(a2).Add(a3)
+	// c.updateImagePlane()
+}
+
 func (c *Camera) updateImagePlane() {
 	center := c.Eye.Add(c.Direction.Multiply(c.distance))
 	left := c.Direction.Cross(c.Up)
