@@ -132,27 +132,60 @@ func NewSphere(center Vector, radius float64, material Material) *Sphere {
 
 func (s *Sphere) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
 
-	m := ray.Origin.Subtract(s.Center)
-	b := m.Dot(ray.Direction)
-	c := m.Dot(m) - s.rad2
+	// m := ray.Origin.Subtract(s.Center)
+	// b := m.Dot(ray.Direction)
+	// c := m.Dot(m) - s.rad2
 
-	if c > 0 && b > 0 {
+	// if c > 0 && b > 0 {
+	// 	return false, t, n
+	// }
+
+	// discr := b*b - c
+
+	// if discr < 0 {
+	// 	return false, t, n
+	// }
+
+	// t = -b - math.Sqrt(discr)
+	// if t < 0 {
+	// 	t = 0
+	// }
+	// n = ray.Point(t).Subtract(s.Center).Normalize()
+	// return true, t, n
+
+	C := ray.Origin.Subtract(s.Center)
+
+	a := ray.Direction.Dot(ray.Direction)
+	b := ray.Direction.Dot(C) * 2
+	c := C.Dot(C) - s.rad2
+	d := b*b - 4*a*c
+
+	if d < 0 {
 		return false, t, n
 	}
 
-	discr := b*b - c
+	sd := math.Sqrt(d)
+	t1 := (-b + sd) / (2 * a)
+	t2 := (-b - sd) / (2 * a)
+	t = math.Max(t1, t2)
+	n = ray.Point(t1).Subtract(s.Center).Normalize()
 
-	if discr < 0 {
-		return false, t, n
-	}
+	return t > 0, t, n
+	// var a = Vector3.Dot(ray.Direction, ray.Direction);
+	//                 var b = Vector3.Dot(2*ray.Direction, C);
+	//                 var c = dotC - _rad2;
+	//                 var d = b*b - 4*a*c;
 
-	t = -b - math.Sqrt(discr)
-	if t < 0 {
-		t = 0
-	}
-	n = ray.Point(t).Subtract(s.Center).Normalize()
-	return true, t, n
+	//                 //no intersection
+	//                 if (d < 0)
+	//                 {
+	//                     return false;
+	//                 }
 
+	//                 var sd = (float)Math.Sqrt(d);
+	//                 var t1 = (-b + sd)/2*a;
+	//                 var t2 = (-b - sd)/2*a;
+	//                 t = Math.Max(t1, t2);
 }
 
 // //fast way to calculate
