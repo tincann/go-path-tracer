@@ -5,7 +5,7 @@ import (
 	"math/rand"
 )
 
-func (t *Tracer) diffuse(scene Scene, intersection Vector, mat Material, normal Vector, bouncesLeft int) Color {
+func (t *Tracer) diffuse(scene *Scene, intersection Vector, mat Material, normal Vector, bouncesLeft int) Color {
 	ray := Ray{
 		Origin:    intersection,
 		Direction: uniformHemisphereSample(normal),

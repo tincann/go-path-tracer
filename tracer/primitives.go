@@ -131,22 +131,25 @@ func NewSphere(center Vector, radius float64, material Material) *Sphere {
 }
 
 func (s *Sphere) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
-	c := ray.Origin.Subtract(s.Center)
-	t = c.Multiply(-1).Dot(ray.Direction)
-	q := c.Multiply(-1).Subtract(ray.Direction.Multiply(t))
-	p2 := q.Dot(q)
-	if p2 > s.rad2 {
+
+	m := ray.Origin.Subtract(s.Center)
+	b := m.Dot(ray.Direction)
+	c := m.Dot(m) - s.rad2
+
+	if c > 0 && b > 0 {
 		return false, t, n
 	}
-	t -= math.Sqrt(s.rad2 - p2)
 
-	if t > 0 {
-		p := ray.Origin.Add(ray.Direction.Multiply(t))
-		n = p.Subtract(s.Center).Normalize()
-		return true, t, n
+	discr := b*b - c
+
+	if discr < 0 {
+		return false, t, n
 	}
 
-	return false, t, n
+	t = -b - math.Sqrt(discr)
+	n = ray.Point(t).Subtract(s.Center).Normalize()
+	return true, t, n
+
 }
 
 // //fast way to calculate

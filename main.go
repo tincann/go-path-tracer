@@ -56,7 +56,7 @@ func trace(screen wde.Image, acc *t.Accumulator, tracer *t.Tracer) {
 
 			ray := t.Ray{Origin: eye, Direction: direction}
 
-			c := tracer.TraceRay(ray, scene, 3)
+			c := tracer.TraceRay(ray, scene, 4)
 			avg := acc.SetPixel(x, y, c)
 			screen.Set(x, y, toSystemColor(avg))
 		}

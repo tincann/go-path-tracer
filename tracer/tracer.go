@@ -11,7 +11,7 @@ func NewTracer(viewplaneWidth, viewplaneHeight, distance float64) *Tracer {
 	return &Tracer{ViewplaneWidth: viewplaneWidth, ViewplaneHeight: viewplaneHeight, Distance: distance}
 }
 
-func (t *Tracer) TraceRay(ray Ray, scene Scene, bouncesLeft int) Color {
+func (t *Tracer) TraceRay(ray Ray, scene *Scene, bouncesLeft int) Color {
 	bouncesLeft--
 	if bouncesLeft+1 == 0 {
 		return Color{}
@@ -31,7 +31,7 @@ func (t *Tracer) TraceRay(ray Ray, scene Scene, bouncesLeft int) Color {
 	if intersectedObj == nil {
 		return scene.Background
 	}
-	intersection := ray.Origin.Add(ray.Direction.Multiply(rayT)).Add(normal.Multiply(-0.00001))
+	intersection := ray.Point(rayT).Add(normal.Multiply(0.001))
 
 	mat := intersectedObj.Material()
 	switch mat.Type {

@@ -5,6 +5,10 @@ type Ray struct {
 	Direction Vector
 }
 
+func (r *Ray) Point(t float64) Vector {
+	return r.Origin.Add(r.Direction.Multiply(t))
+}
+
 type Intersectable interface {
 	Intersect(ray Ray) (intersected bool, t float64, n Vector)
 	Material() Material
@@ -23,6 +27,6 @@ type Color struct {
 type MaterialType int
 
 const (
-	Light   MaterialType = 0
-	Diffuse              = 1
+	Light   MaterialType = -1
+	Diffuse              = 0
 )
