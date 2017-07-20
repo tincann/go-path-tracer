@@ -1,6 +1,10 @@
 package main
 
 import (
+	"image"
+
+	"math"
+
 	"github.com/skelterjohn/go.wde"
 	_ "github.com/skelterjohn/go.wde/xgb"
 	t "github.com/tincann/go-path-tracer/tracer"
@@ -28,22 +32,53 @@ func start() {
 
 	tracer := t.NewTracer(camera, 1, 4)
 
-	acc := t.NewAccumulator(bounds)
-
-	go handleEvents(w, screen, acc, tracer)
+	regions := divideIntoRegions(2, 2, bounds)
+	go handleEvents(w, screen, regions, tracer)
 
 	w.FlushImage(bounds)
 	w.Show()
 
 	scene := t.TriangleScene()
+
 	for {
-		tracer.TraceRegion(bounds, bounds, acc, scene, 10)
-		acc.DrawContents(screen)
-		w.FlushImage(acc.Bounds)
+		for _, region := range regions {
+			tracer.TraceRegion(bounds, region.Bounds, region.Accumulator, scene, 1)
+			region.Accumulator.DrawContents(screen)
+		}
+		w.FlushImage(bounds)
 	}
 }
 
-func handleEvents(w wde.Window, screen wde.Image, acc *t.Accumulator, tracer *t.Tracer) {
+type ScreenRegion struct {
+	Bounds      image.Rectangle
+	Accumulator *t.Accumulator
+}
+
+func divideIntoRegions(xParts, yParts int, screen image.Rectangle) []*ScreenRegion {
+	regions := make([]*ScreenRegion, xParts*yParts)
+	for y := 0; y < yParts; y++ {
+		for x := 0; x < xParts; x++ {
+			r := ScreenRegion{}
+
+			xWidth := float64(screen.Dx()) / float64(xParts)
+			yWidth := float64(screen.Dy()) / float64(yParts)
+
+			r.Bounds.Min.X = int(math.Floor(float64(x) * xWidth))
+			r.Bounds.Min.Y = int(math.Floor(float64(y) * yWidth))
+
+			r.Bounds.Max.X = int(math.Floor(float64(x+1) * xWidth))
+			r.Bounds.Max.Y = int(math.Floor(float64(y+1) * yWidth))
+
+			r.Accumulator = t.NewAccumulator(r.Bounds)
+
+			i := xParts*y + x
+			regions[i] = &r
+		}
+	}
+	return regions
+}
+
+func handleEvents(w wde.Window, screen wde.Image, regions []*ScreenRegion, tracer *t.Tracer) {
 	for {
 		e := <-w.EventChan()
 
@@ -77,19 +112,25 @@ func handleEvents(w wde.Window, screen wde.Image, acc *t.Accumulator, tracer *t.
 				theta++
 
 			case wde.KeyTab:
-				acc.Reset()
+				resetAccumulators(regions)
 
 			}
 		}
 
 		if moveVector.X != 0 || moveVector.Y != 0 || moveVector.Z != 0 {
 			tracer.Camera.Move(moveVector)
-			acc.Reset()
+			resetAccumulators(regions)
 		}
 
 		if theta != 0 || phi != 0 {
 			tracer.Camera.Rotate(phi, theta)
-			acc.Reset()
+			resetAccumulators(regions)
 		}
+	}
+}
+
+func resetAccumulators(regions []*ScreenRegion) {
+	for _, region := range regions {
+		region.Accumulator.Reset()
 	}
 }

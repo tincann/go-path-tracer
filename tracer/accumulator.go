@@ -22,10 +22,10 @@ func NewAccumulator(bounds image.Rectangle) *Accumulator {
 }
 
 func (a *Accumulator) DrawContents(screen wde.Image) {
-	for y := a.Bounds.Min.Y; y < a.Bounds.Max.Y; y++ {
-		for x := a.Bounds.Min.X; x < a.Bounds.Max.X; x++ {
+	for y := 0; y < a.Bounds.Dy(); y++ {
+		for x := 0; x < a.Bounds.Dx(); x++ {
 			i := a.Bounds.Dx()*y + x
-			screen.Set(x, y, toSystemColor(a.Data[i]))
+			screen.Set(a.Bounds.Min.X+x, a.Bounds.Min.Y+y, toSystemColor(a.Data[i]))
 		}
 	}
 }
@@ -39,7 +39,11 @@ func toSystemColor(c Color) color.RGBA {
 }
 
 func (a *Accumulator) SetPixel(x, y int, color Color) Color {
-	i := a.Bounds.Dx()*y + x
+	//normalize x and y
+	xx := x - a.Bounds.Min.X
+	yy := y - a.Bounds.Min.Y
+
+	i := a.Bounds.Dx()*yy + xx
 
 	c := a.Data[i]
 	c.R = (c.R*float32(a.frames) + color.R) / float32(a.frames+1)
