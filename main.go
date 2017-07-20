@@ -5,6 +5,12 @@ import (
 
 	"math"
 
+	"sync"
+
+	"time"
+
+	"fmt"
+
 	"github.com/skelterjohn/go.wde"
 	_ "github.com/skelterjohn/go.wde/xgb"
 	t "github.com/tincann/go-path-tracer/tracer"
@@ -32,20 +38,32 @@ func start() {
 
 	tracer := t.NewTracer(camera, 1, 4)
 
-	regions := divideIntoRegions(2, 2, bounds)
+	numRegions := 2
+	regions := divideIntoRegions(numRegions, numRegions, bounds)
 	go handleEvents(w, screen, regions, tracer)
 
 	w.FlushImage(bounds)
 	w.Show()
 
 	scene := t.TriangleScene()
-
 	for {
+		wg := sync.WaitGroup{}
+		wg.Add(len(regions))
+
+		start := time.Now()
+
 		for _, region := range regions {
-			tracer.TraceRegion(bounds, region.Bounds, region.Accumulator, scene, 1)
-			region.Accumulator.DrawContents(screen)
+			go func(r *ScreenRegion) {
+				tracer.TraceRegion(bounds, r.Bounds, r.Accumulator, scene, 10)
+				r.Accumulator.DrawContents(screen)
+				wg.Done()
+			}(region)
 		}
+
+		wg.Wait()
 		w.FlushImage(bounds)
+
+		fmt.Println(time.Since(start).Seconds())
 	}
 }
 
