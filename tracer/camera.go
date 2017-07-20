@@ -2,6 +2,7 @@ package tracer
 
 import (
 	"image"
+	"math/rand"
 )
 
 type Camera struct {
@@ -33,16 +34,17 @@ func NewCamera(eye, direction, up Vector, dImagePlane, imagePlaneWidth, imagePla
 	return c
 }
 
-func (c *Camera) GenerateRays(pixelDimensions image.Point, area image.Rectangle) []*RayInfo {
-	maxX, maxY := pixelDimensions.X, pixelDimensions.Y
+func (c *Camera) GenerateRays(pixelDimensions, area image.Rectangle, aaFactor float64) []*RayInfo {
+	maxX, maxY := pixelDimensions.Dx(), pixelDimensions.Dy()
 
 	topLeft, upper, left := c.imagePlane.TopLeft, c.imagePlane.UpperEdge, c.imagePlane.LeftEdge
 	rayInfos := make([]*RayInfo, area.Dx()*area.Dy())
 	i := 0
+
 	for x := area.Min.X; x < area.Max.X; x++ {
 		for y := area.Min.Y; y < area.Max.Y; y++ {
-			vx := float64(x) / float64(maxX)
-			vy := float64(y) / float64(maxY)
+			vx := (float64(x) + 0.5 + rand.Float64()*aaFactor - aaFactor/2) / float64(maxX)
+			vy := (float64(y) + 0.5 + rand.Float64()*aaFactor - aaFactor/2) / float64(maxY)
 
 			p := topLeft.Add(upper.Multiply(vx)).Add(left.Multiply(vy))
 			direction := p.Subtract(c.Eye).Normalize()

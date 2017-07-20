@@ -1,13 +1,32 @@
 package tracer
 
-import "math"
+import (
+	"image"
+	"math"
+)
 
 type Tracer struct {
-	Camera *Camera
+	Camera     *Camera
+	aaFactor   float64 //Anti-aliasing factor (blurring)
+	maxBounces int
 }
 
-func NewTracer(camera *Camera) *Tracer {
-	return &Tracer{Camera: camera}
+func NewTracer(camera *Camera, aaFactor float64, maxBounces int) *Tracer {
+	return &Tracer{Camera: camera, aaFactor: aaFactor, maxBounces: maxBounces}
+}
+
+func (t *Tracer) TraceRegion(maxDimensions, region image.Rectangle, acc *Accumulator, scene *Scene, iterations int) {
+	// region := image.Rectangle{Min: image.Point{128, 128}, Max: image.Point{300, 300}}
+	rayInfos := t.Camera.GenerateRays(maxDimensions, region, t.aaFactor)
+
+	for iterations > 0 {
+		for _, rayInfo := range rayInfos {
+			c := t.TraceRay(rayInfo.Ray, scene, t.maxBounces)
+			acc.SetPixel(rayInfo.X, rayInfo.Y, c)
+		}
+		acc.NextFrame()
+		iterations--
+	}
 }
 
 func (t *Tracer) TraceRay(ray Ray, scene *Scene, bouncesLeft int) Color {

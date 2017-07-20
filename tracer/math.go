@@ -94,3 +94,14 @@ func (c Color) Divide(scalar float32) Color {
 		B: c.B / scalar,
 	}
 }
+
+func Clamp(value, min, max float32) float32 {
+	if value > max {
+		return max
+	}
+	if value < min {
+		return min
+	}
+
+	return value
+}

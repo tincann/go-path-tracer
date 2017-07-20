@@ -1,9 +1,6 @@
 package main
 
 import (
-	"image"
-	"image/color"
-
 	"github.com/skelterjohn/go.wde"
 	_ "github.com/skelterjohn/go.wde/xgb"
 	t "github.com/tincann/go-path-tracer/tracer"
@@ -32,49 +29,21 @@ func start() {
 		0.5, //move speed
 	)
 
-	tracer := t.NewTracer(camera)
+	tracer := t.NewTracer(camera, 1, 4)
 
 	go handleEvents(w, w.Screen(), acc, tracer)
+
+	screen := w.Screen()
+	bounds := screen.Bounds()
 
 	w.FlushImage(w.Screen().Bounds())
 	w.Show()
 
 	for {
-		trace(w.Screen(), acc, tracer, scene)
+		tracer.TraceRegion(bounds, bounds, acc, scene, 10)
+		acc.DrawContents(screen)
 		w.FlushImage(acc.Bounds)
-		acc.NextFrame()
-
 	}
-}
-
-func trace(screen wde.Image, acc *t.Accumulator, tracer *t.Tracer, scene *t.Scene) {
-	b := screen.Bounds()
-	rayInfos := tracer.Camera.GenerateRays(image.Point{b.Max.X, b.Max.Y}, b)
-
-	for _, rayInfo := range rayInfos {
-		c := tracer.TraceRay(rayInfo.Ray, scene, 4)
-		avg := acc.SetPixel(rayInfo.X, rayInfo.Y, c)
-		screen.Set(rayInfo.X, rayInfo.Y, toSystemColor(avg))
-	}
-}
-
-func toSystemColor(c t.Color) color.RGBA {
-	return color.RGBA{
-		R: uint8(clamp(c.R, 0, 1) * 255),
-		G: uint8(clamp(c.G, 0, 1) * 255),
-		B: uint8(clamp(c.B, 0, 1) * 255),
-	}
-}
-
-func clamp(value, min, max float32) float32 {
-	if value > max {
-		return max
-	}
-	if value < min {
-		return min
-	}
-
-	return value
 }
 
 func handleEvents(w wde.Window, screen wde.Image, acc *t.Accumulator, tracer *t.Tracer) {
