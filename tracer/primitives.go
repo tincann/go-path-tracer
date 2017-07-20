@@ -84,7 +84,7 @@ func (tr *Triangle) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
 	}
 
 	t = e2.Dot(qvec) * invDet
-	return true, t, n
+	return t > 0, t, n
 }
 
 type Quad struct {
