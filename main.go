@@ -13,32 +13,29 @@ func main() {
 
 func start() {
 	w, _ := wde.NewWindow(500, 500)
-	acc := t.NewAccumulator(w.Screen().Bounds())
+	screen := w.Screen()
+	bounds := screen.Bounds()
 
-	scene := t.TriangleScene()
-
-	eye := t.NewVector(0, -3, 0)
-	direction := t.NewVector(0, 1, 0)
 	camera := t.NewCamera(
-		eye,
-		direction,
-		t.NewVector(0, 0, 1),
-		1.5, //distance to image plane
-		3,   //image plane width
-		3,   //image plane height
-		0.5, //move speed
+		t.NewVector(0, -3, 0), //eye
+		t.NewVector(0, 1, 0),  //direction
+		t.NewVector(0, 0, 1),  //up
+		1.5,                   //distance to image plane
+		3,                     //image plane width
+		3,                     //image plane height
+		0.5,                   //move speed
 	)
 
 	tracer := t.NewTracer(camera, 1, 4)
 
-	go handleEvents(w, w.Screen(), acc, tracer)
+	acc := t.NewAccumulator(bounds)
 
-	screen := w.Screen()
-	bounds := screen.Bounds()
+	go handleEvents(w, screen, acc, tracer)
 
-	w.FlushImage(w.Screen().Bounds())
+	w.FlushImage(bounds)
 	w.Show()
 
+	scene := t.TriangleScene()
 	for {
 		tracer.TraceRegion(bounds, bounds, acc, scene, 10)
 		acc.DrawContents(screen)
