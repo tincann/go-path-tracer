@@ -15,7 +15,7 @@ func (s *Scene) AddObject(t Intersectable) {
 	s.Objects = append(s.Objects, t)
 }
 
-func TriangleScene() *Scene {
+func DefaultScene() *Scene {
 	scene := NewScene()
 
 	// scene.Background = Color{R: 55 / 255.0, G: 55 / 255.0, B: 55 / 255.0}
@@ -48,10 +48,20 @@ func TriangleScene() *Scene {
 
 	//sphere
 	scene.AddObject(NewSphere(
-		NewVector(0, 1.5, -0.5),
+		NewVector(0, 0, -0.5),
 		0.5,
 		Material{
 			Color: Color{R: 0.8},
+			Type:  Diffuse,
+		},
+	))
+
+	//sphere 2
+	scene.AddObject(NewSphere(
+		NewVector(1.5, 0, -0.5),
+		0.5,
+		Material{
+			Color: Color{G: 0.8},
 			Type:  Diffuse,
 		},
 	))

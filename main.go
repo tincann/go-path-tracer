@@ -7,10 +7,6 @@ import (
 
 	"sync"
 
-	"time"
-
-	"fmt"
-
 	"github.com/skelterjohn/go.wde"
 	_ "github.com/skelterjohn/go.wde/xgb"
 	t "github.com/tincann/go-path-tracer/tracer"
@@ -27,16 +23,21 @@ func start() {
 	bounds := screen.Bounds()
 
 	camera := t.NewCamera(
-		t.NewVector(0, -3, 0), //eye
+		t.NewVector(0, -2, 0), //eye
 		t.NewVector(0, 1, 0),  //direction
 		t.NewVector(0, 0, 1),  //up
 		1.5,                   //distance to image plane
 		3,                     //image plane width
 		3,                     //image plane height
-		0.5,                   //move speed
+		0.5,                   //move speed,
+		0.5,                   //look speed
 	)
 
-	tracer := t.NewTracer(camera, 1, 4)
+	tracer := t.NewTracer(
+		camera,
+		1, //anti-aliasing factor
+		4, //maximum number of bounces
+	)
 
 	numRegions := 2
 	regions := divideIntoRegions(numRegions, numRegions, bounds)
@@ -45,16 +46,16 @@ func start() {
 	w.FlushImage(bounds)
 	w.Show()
 
-	scene := t.TriangleScene()
+	scene := t.DefaultScene()
 	for {
 		wg := sync.WaitGroup{}
 		wg.Add(len(regions))
 
-		start := time.Now()
+		// start := time.Now()
 
 		for _, region := range regions {
 			go func(r *ScreenRegion) {
-				tracer.TraceRegion(bounds, r.Bounds, r.Accumulator, scene, 10)
+				tracer.TraceRegion(bounds, r.Bounds, r.Accumulator, scene, 1)
 				r.Accumulator.DrawContents(screen)
 				wg.Done()
 			}(region)
@@ -63,7 +64,7 @@ func start() {
 		wg.Wait()
 		w.FlushImage(bounds)
 
-		fmt.Println(time.Since(start).Seconds())
+		// fmt.Println(time.Since(start).Seconds())
 	}
 }
 
@@ -78,14 +79,14 @@ func divideIntoRegions(xParts, yParts int, screen image.Rectangle) []*ScreenRegi
 		for x := 0; x < xParts; x++ {
 			r := ScreenRegion{}
 
-			xWidth := float64(screen.Dx()) / float64(xParts)
-			yWidth := float64(screen.Dy()) / float64(yParts)
+			regionWidth := float64(screen.Dx()) / float64(xParts)
+			regionHeight := float64(screen.Dy()) / float64(yParts)
 
-			r.Bounds.Min.X = int(math.Floor(float64(x) * xWidth))
-			r.Bounds.Min.Y = int(math.Floor(float64(y) * yWidth))
+			r.Bounds.Min.X = int(math.Floor(float64(x) * regionWidth))
+			r.Bounds.Min.Y = int(math.Floor(float64(y) * regionHeight))
 
-			r.Bounds.Max.X = int(math.Floor(float64(x+1) * xWidth))
-			r.Bounds.Max.Y = int(math.Floor(float64(y+1) * yWidth))
+			r.Bounds.Max.X = int(math.Floor(float64(x+1) * regionWidth))
+			r.Bounds.Max.Y = int(math.Floor(float64(y+1) * regionHeight))
 
 			r.Accumulator = t.NewAccumulator(r.Bounds)
 
@@ -125,8 +126,12 @@ func handleEvents(w wde.Window, screen wde.Image, regions []*ScreenRegion, trace
 			case wde.KeyLeftShift:
 				moveVector.Z--
 			case wde.KeyLeftArrow:
-				theta--
+				phi--
 			case wde.KeyRightArrow:
+				phi++
+			case wde.KeyUpArrow:
+				theta--
+			case wde.KeyDownArrow:
 				theta++
 
 			case wde.KeyTab:

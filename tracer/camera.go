@@ -2,6 +2,7 @@ package tracer
 
 import (
 	"image"
+	"math"
 	"math/rand"
 )
 
@@ -9,11 +10,13 @@ type Camera struct {
 	Eye, Direction, Up Vector
 	right              Vector //vector pointing right
 
+	phi, theta float64 //latitude and longitude of look direction
+
 	imagePlaneWidth, imagePlaneHeight float64 //width and height of the view plane
 	distance                          float64 //camera distance from view plane
 	imagePlane                        *imagePlane
 
-	moveSpeed float64
+	moveSpeed, lookSpeed float64
 }
 
 //Represents the upper and left border of the image plane
@@ -24,11 +27,14 @@ type imagePlane struct {
 
 type CameraMoveDirection int
 
-func NewCamera(eye, direction, up Vector, dImagePlane, imagePlaneWidth, imagePlaneHeight float64, moveSpeed float64) *Camera {
+func NewCamera(eye, direction, up Vector, dImagePlane, imagePlaneWidth, imagePlaneHeight float64, moveSpeed, lookSpeed float64) *Camera {
+	direction = direction.Normalize()
+	phi, theta := directionToAngles(direction)
 	c := &Camera{
-		Eye: eye, Direction: direction.Normalize(), Up: up.Normalize(),
+		Eye: eye, Direction: direction, Up: up.Normalize(),
 		distance: dImagePlane, imagePlaneWidth: imagePlaneWidth, imagePlaneHeight: imagePlaneHeight,
-		moveSpeed: moveSpeed,
+		moveSpeed: moveSpeed, lookSpeed: lookSpeed,
+		phi: phi, theta: theta,
 	}
 	c.updateImagePlane()
 	return c
@@ -71,19 +77,41 @@ func (c *Camera) Move(direction Vector) {
 	c.updateImagePlane()
 }
 
-func (c *Camera) Rotate(deltaTheta, deltaPhi float64) {
-	//rotate round up vector
-	// a1 := c.Direction.Multiply(math.Cos(deltaTheta))
-	// a2 := c.right.Multiply(math.Sin(deltaTheta))
-	// a3 := c.Direction.Multiply(c.Up.Dot(c.Direction) * (1 - math.Cos(deltaTheta)))
-	// c.Direction = a1.Add(a2).Add(a3)
-	// c.updateImagePlane()
+func (c *Camera) Rotate(deltaPhi, deltaTheta float64) {
+
+	c.phi += deltaPhi * c.lookSpeed
+	c.theta += deltaTheta * c.lookSpeed
+
+	if c.theta < 0 {
+		c.theta = 0
+	} else if c.theta > math.Pi {
+		c.theta = math.Pi
+	}
+
+	//calculate new direction vector
+	c.Direction = anglesToDirection(c.phi, c.theta)
+	c.updateImagePlane()
+}
+
+func anglesToDirection(phi, theta float64) Vector {
+	return NewVector(
+		math.Cos(phi)*math.Sin(theta),
+		math.Sin(phi)*math.Sin(theta),
+		math.Cos(theta),
+	)
+}
+
+func directionToAngles(direction Vector) (phi, theta float64) {
+	phi = math.Atan2(direction.Y, direction.X)
+	theta = math.Acos(direction.Z)
+	return phi, theta
 }
 
 func (c *Camera) updateImagePlane() {
 	center := c.Eye.Add(c.Direction.Multiply(c.distance))
-	left := c.Direction.Cross(c.Up)
+	left := c.Direction.Cross(Vector{0, 0, 1})
 	c.right = left.Multiply(-1)
+	c.Up = left.Cross(c.Direction)
 
 	c.imagePlane = &imagePlane{
 		TopLeft:   center.Add(left.Multiply(c.imagePlaneWidth / 2)).Add(c.Up.Multiply(c.imagePlaneHeight / 2)),

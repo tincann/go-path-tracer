@@ -29,8 +29,13 @@ func NewPlane(normal Vector, d float64, material Material) *Plane {
 }
 
 func (p *Plane) Intersect(ray Ray) (intersected bool, t float64, n Vector) {
-	t = (ray.Origin.Dot(p.Normal) + p.D) / ray.Direction.Dot(p.Normal)
-	return t >= 0, t, p.Normal
+	n = p.Normal
+	dn := ray.Direction.Dot(p.Normal)
+	if dn > 0 {
+		return false, t, n
+	}
+	t = (-ray.Origin.Dot(n) + p.D) / dn
+	return t >= 0, t, n
 }
 
 type Triangle struct {
